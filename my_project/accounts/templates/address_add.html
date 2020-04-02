@@ -1,0 +1,96 @@
+{% extends 'base.html'%}
+{% block title %}
+<title>添加地址</title>
+{% endblock %}
+{% block container %}
+    <!--主体-->
+    <header class="wy-header">
+      <div class="wy-header-icon-back"><span></span></div>
+      <div class="wy-header-title">添加地址</div>
+    </header>
+    <form action="{% url 'accounts:address_add' %}" method="post" class="weui-content">
+      <div class="weui-cells weui-cells_form wy-address-edit">
+        <div class="weui-cell">
+          <div class="weui-cell__hd">
+            <label class="weui-label wy-lab">收货人</label>
+          </div>
+          <div class="weui-cell__bd">
+            <input
+              class="weui-input"
+              type="text"
+              name="username"
+              placeholder="请输入收货人"
+            />
+          </div>
+        </div>
+          {{ form.username.errors }}
+        <div class="weui-cell">
+          <div class="weui-cell__hd">
+            <label class="weui-label wy-lab">手机号</label>
+          </div>
+          <div class="weui-cell__bd">
+            <input
+              class="weui-input"
+              type="text"
+              name="phone"
+              placeholder="请输入手机号"
+            />
+          </div>
+        </div>
+          {{ form.phone.errors }}
+        <div class="weui-cell">
+          <div class="weui-cell__hd">
+            <label for="name" class="weui-label wy-lab">所在地区</label>
+          </div>
+          <div class="weui-cell__bd">
+            <input
+              class="weui-input"
+              id="address"
+              type="text"
+              name="region"
+              value="广东省 广州市 天河区"
+              readonly=""
+              data-code="420106"
+              data-codes="420000,420100,420106"
+            />
+          </div>
+        </div>
+          {{ form.region.errors }}
+        <div class="weui-cell">
+          <div class="weui-cell__hd">
+            <label class="weui-label wy-lab">详细地址</label>
+          </div>
+          <div class="weui-cell__bd">
+            <textarea
+              class="weui-textarea"
+              name='address'
+              placeholder="请输入详细地址"
+            ></textarea>
+          </div>
+        </div>
+          {{ form.address.errors }}
+          {{ form.non_field_errors }}
+        <div class="weui-cell weui-cell_switch">
+          <div class="weui-cell__bd">设为默认地址</div>
+          <div class="weui-cell__ft">
+            <input class="weui-switch" type="checkbox" />
+          </div>
+        </div>
+      </div>
+      <div class="weui-btn-area">
+        <input class="weui-btn weui-btn_primary" type="submit" id="showTooltips" value="保存此地址">
+        <a href="" class="weui-btn weui-btn_warn">删除此地址</a>
+      </div>
+    </form>
+{% endblock %}
+{% block footer %}
+    <script src="/static/js/city-picker.js"></script>
+    <script>
+      $('#address').cityPicker({
+        title: '选择出发地',
+        onChange: function(picker, values, displayValues) {
+          console.log(values, displayValues);
+        }
+      });
+    </script>
+{% endblock %}
