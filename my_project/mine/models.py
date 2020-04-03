@@ -8,7 +8,7 @@ from utils import constants
 
 class Order(models.Model):
     """ 订单模型 """
-    sn = models.CharField('订单编号', max_length=32)
+    sn = models.CharField('订单编号', max_length=100)
     user = models.ForeignKey(User, related_name='orders', on_delete=models.CASCADE)
     buy_count = models.IntegerField('购买数量', default=1)
     buy_amount = models.FloatField('总价')
@@ -33,6 +33,11 @@ class Order(models.Model):
         verbose_name = '订单管理'
         verbose_name_plural = '订单管理'
 
+    def get_cart_products(self):
+        """ 购物车中已下单的商品 """
+        # 排除还在购物车状态的商品
+        return self.carts.exclude(status=constants.ORDER_STATUS_INIT)
+
     def __str__(self):
         return self.sn
 
@@ -40,7 +45,7 @@ class Cart(models.Model):
     """ 购物车 """
     user = models.ForeignKey(User, related_name='carts', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, verbose_name='订单', null=True, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, verbose_name='订单', related_name='carts',null=True, on_delete=models.CASCADE)
     # 商品快照
     name = models.CharField('商品名称', max_length=128)
     img = models.ImageField('商品的主图')

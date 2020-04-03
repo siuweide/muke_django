@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 # Create your models here.
+from django.db.models import F
+
 
 class User(AbstractUser):
     """ 用户的基础信息表 """
@@ -9,12 +11,39 @@ class User(AbstractUser):
     avatar = models.ImageField('用户头像', upload_to='avatar', null=True)
     integral = models.IntegerField('用户积分', default=0)
     nickname = models.CharField('昵称', max_length=32)
-    level = models.SmallIntegerField('用户级别')
+    level = models.SmallIntegerField('用户级别', null=True)
 
     class Meta:
         db_table = 'accounts_user'
         verbose_name = '用户基础信息'
         verbose_name_plural = '用户基础信息'
+
+    @property
+    def default_addr(self):
+        """ 用户的默认地址， 在多个地方用到 """
+        addr = None
+        user_list = self.user_address.filter(is_valid=True)
+        # 1.找到默认地址
+        try:
+            addr = user_list.filter(is_default=True)[0]
+        except IndexError:
+            try:
+                addr = user_list[0]
+                # 2.如果没有默认地址，显示所有地址的第一个
+            except IndexError:
+                pass
+        return addr
+
+    def ope_integral_account(self,  types, count):
+        """ 积分操作 """
+        if types == 1:
+            # 充值
+            self.integral = F('integral') + abs(count)
+        else:
+            # 消费
+            self.integral = F('integral') - abs(count)
+        self.save()
+        self.refresh_from_db()
 
 class UserProfile(models.Model):
     """ 用户的详细信息 """
@@ -71,6 +100,9 @@ class UserAddress(models.Model):
     def get_region_format(self):
         """ 省市区 """
         return '{self.province} {self.city} {self.area}'.format(self=self)
+
+    def __str__(self):
+        return self.get_region_format()
 
 class LoginRecord(models.Model):
     """ 用户的登录历史 """

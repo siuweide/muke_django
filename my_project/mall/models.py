@@ -3,6 +3,7 @@ import uuid
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from ckeditor.fields import RichTextField
+from django.db.models import F
 
 from system.models import ImageFile
 from utils import constants
@@ -10,7 +11,7 @@ from utils import constants
 class Classify(models.Model):
     """ 商品的分类 """
     uid = models.UUIDField('分类ID', default=uuid.uuid4, editable=True)
-    parent = models.ForeignKey('self', related_name='children', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', related_name='children', on_delete=models.CASCADE, null=True, blank=True)
     img = models.ImageField('分类主图', upload_to='classify')
     code = models.CharField('编码', max_length=32, null=True, blank=True)
     name = models.CharField('名称', max_length=12)
@@ -26,6 +27,8 @@ class Classify(models.Model):
         ordering = ['-reorder']
         verbose_name = '商品分类'
         verbose_name_plural = '商品分类'
+    def __str__(self):
+        return '{}:{}'.format(self.code, self.name)
 
 class Tag(models.Model):
     """ 商品的标签 """
@@ -45,6 +48,9 @@ class Tag(models.Model):
         ordering = ['-reorder']
         verbose_name = '商品标签'
         verbose_name_plural= '商品标签'
+
+    def __str__(self):
+        return '{}:{}'.format(self.code, self.name)
 
 class Product(models.Model):
     """ 商品 """
@@ -93,6 +99,12 @@ class Product(models.Model):
         ordering = ['-reorder']
         verbose_name = '商品信息'
         verbose_name_plural = '商品信息'
+
+    def update_store_count(self, count):
+        """ 更改商品的库存信息 """
+        self.ramain_count = F('ramain_count') - abs(count)
+        self.save()
+        self.refresh_from_db()
 
     def __str__(self):
         return self.name

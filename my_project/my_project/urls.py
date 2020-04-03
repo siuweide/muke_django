@@ -33,5 +33,7 @@ urlpatterns = [
     # 用户账户模块
     path('accounts/', include('accounts.urls', namespace='accounts')),
     # 商品模块
-    path('mall/', include('mall.urls', namespace='mall'))
+    path('mall/', include('mall.urls', namespace='mall')),
+    # 个人中心
+    path('mine/', include('mine.urls', namespace='mine')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
