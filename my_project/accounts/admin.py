@@ -5,12 +5,19 @@ from accounts.models import User, UserProfile, UserAddress, LoginRecord
 
 
 class UserAdmin(UserAdmin):
-    """ 用户管理 """
+    """ 用户基础信息 """
     list_display = ['format_username', 'nickname', 'integral', 'is_active']
     # 支持用户名、昵称搜索
     search_fields = ['username', 'nickname']
     # 添加自定义的方法
     actions = ['disable_user', 'enable_user']
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'integral', 'nickname', 'level')}),
+        (('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
 
     def format_username(self, obj):
         """ 用户名脱敏处理 """

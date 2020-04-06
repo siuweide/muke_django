@@ -74,7 +74,7 @@
           >
         </div>
         <div class="weui-flex__item">
-          <a href="all_orders.html" class="wy-links-iconlist"
+          <a href="../mine/templates/order_list.html" class="wy-links-iconlist"
             ><div class="img"><img src="/static/images/icon-link3.png" /></div>
             <p>订单管理</p></a
           >
@@ -223,7 +223,7 @@
       </div>
     </div>
     {# 包含底部的html模块 #}
-    {% include 'footer.html' %}
+    {% include 'footer.html' with tab='index' %}
 {% endblock %}
 {% block footer %}
     <script src="/static/js/swiper.js"></script>

@@ -45,6 +45,6 @@ ORDER_STATUS_CHOICES = (
     (ORDER_STATUS_SUBMIT, '已提交'),
     (ORDER_STATUS_PAIED, '已支付'),
     (ORDER_STATUS_SENT, '已发货'),
-    (ORDER_STATUS_DONE, '已发货'),
+    (ORDER_STATUS_DONE, '已完成'),
     (ORDER_STATUS_DELETE, '已删除'),
 )

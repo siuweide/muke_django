@@ -1,16 +1,22 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Q
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 
 from mall.models import Product
 from mine.models import Order, Cart
 from utils import constants
 from utils import tools
 
+@login_required()
+def index(request):
+    """ 个人中心首页 """
+    return render(request, 'mine.html', {
+        "constants":constants
+    })
 
 class OrderDetailView(DetailView):
     """ 订单详情 """
@@ -18,6 +24,11 @@ class OrderDetailView(DetailView):
     slug_field = 'sn'
     slug_url_kwarg = 'sn'
     template_name = 'order_info.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['constants'] = constants
+        return context
 
 @login_required
 @transaction.atomic()
@@ -109,7 +120,8 @@ def order_pay(request):
     if request.method == 'POST':
         sn = request.POST.get('sn', '')
         # 1. 查询订单信息
-        order = get_object_or_404(Order, sn=sn, user=user)
+        order = get_object_or_404(Order, sn=sn, user=user,
+                                  status=constants.ORDER_STATUS_SUBMIT)
         # 2.验证钱够不够
         if order.buy_amount > user.integral:
             messages.error(request, '积分余额不足')
@@ -123,3 +135,51 @@ def order_pay(request):
         order.carts.all().update(status=constants.ORDER_STATUS_PAIED)
         messages.success(request, '支付成功')
     return redirect('mine:order_detail', sn=sn)
+
+@login_required()
+def order_list(request):
+    """ 我的订单 """
+    status = request.GET.get('status', '')
+    try:
+        status = int(status)
+    except ValueError:
+        status = ''
+    return render(request, 'order_list.html', {
+        'constants':constants,
+        'status':status,
+    })
+
+# class-based
+class OrderListView(ListView):
+    """ 基于类视图的订单列表 """
+    model = Order
+    template_name = 'order_list.html'
+
+    def get_queryset(self):
+        """ 查询订单 """
+        status = self.request.GET.get('status', '')
+        user = self.request.user
+        query = Q(user=user)
+        if status:
+            query = query & Q(status=status)
+        return Order.objects.filter(query).exclude(
+            status=constants.ORDER_STATUS_DELETE
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        status = self.request.GET.get('status', '')
+        try:
+            status = int(status)
+        except ValueError:
+            status = ''
+        context['constants'] = constants
+        context['status'] = status
+        return context
+
+@login_required()
+def prod_collect(request):
+    """ 我的收藏 """
+    return render(request, 'prod_collect.html', {
+
+    })

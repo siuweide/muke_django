@@ -62,3 +62,9 @@ class ProductList(ListView):
         context['search_data'] = self.request.GET.dict()
         context['params'] = self.request.GET.dict()
         return context
+
+def product_classify(request):
+    """ 商品分类 """
+    return render(request, 'prod_classify.html', {
+
+    })

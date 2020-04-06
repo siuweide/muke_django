@@ -12,5 +12,7 @@ urlpatterns = [
         template_name = 'product_load_list.html'
     ), name='product_load_list'),
     # 商品详情
-    path("prod/detail/<int:pk>/", views.product_detail, name='product_detail')
+    path("prod/detail/<int:pk>/", views.product_detail, name='product_detail'),
+    # 商品分类
+    path("prod/classify/", views.product_classify, name='product_classify')
 ]
